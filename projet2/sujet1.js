@@ -36,6 +36,22 @@ const fileName = process.argv[2];
     return false;
   }
 
+//Exo 3
+https://medium.com/better-programming/google-interview-question-check-sum-in-array-ba03c0c1a3e6
+function checkSumInArray(sum, numbers) {
+  const parsedNumbers = {};
+  for (let i = 0; i < numbers.length; i ++) {
+      const diff = sum - numbers[i];
+      if (parsedNumbers[diff]) {
+          return true;
+      } else {
+          parsedNumbers[numbers[i]] = true;
+      }
+  };
+  return false;
+}
+
+
 
 
 
