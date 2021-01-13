@@ -1,45 +1,59 @@
+// -------------------------- fusion --------------------------
+var countFusion = 0;
 
-const fs = require("fs");
+const fusion = (t1, t2) => {
+  var i = 0, j = 0, k = 0;
+  var n = t1.length, m = t2.length;
+  var t = new Array(n+m);
 
-const fileName = process.argv[2];
+  while (i < n && j < m) {
+    if (t1[i] < t2[j]) {
+      t[k] = t1[i];
+      i++;
+    } else {
+      t[k] = t2[j];
+      j++;
+    }
+    k++;
+    countFusion++;
+  }
+  while (i < n) {
+    t[k] = t1[i];
+    i++;
+    k++;
+    countFusion++;
+  }
+  while (j < m) {
+    t[k] = t2[j];
+    j++;
+    k++;
+    countFusion++;
+  }
+  return t;
+}
 
+const sliceAndFusion = (t) => {
 
+  var n = t.length;
+  var t1, t2;
 
-// MERGE SORT
+  if (n == 0 || n == 1) {
+    return t;
+  } else {
+    t1 = sliceAndFusion(t.slice(0,n/2));
+    t2 = sliceAndFusion(t.slice(n/2));
+    return fusion (t1,t2);
+  }
+}
+// -------------------------- end fusion -------------------------
 
-var mergeCount = 0;
-const merge = (arr1, arr2) => {
-  let sorted = [];
-
-  while (arr1.length && arr2.length) {
-    mergeCount ++;
-    if (arr1[0] < arr2[0]) sorted.push(arr1.shift()) ;
-    else sorted.push(arr2.shift());
-  };
-
-  return sorted.concat(arr1.slice().concat(arr2.slice()));
-
-};
-
-
-const mergeSort = (arr) => {
-  if (arr.length <= 1) return arr;
-    let mid = Math.floor(arr.length / 2),
-        left = mergeSort(arr.slice(0, mid)),
-        right = mergeSort(arr.slice(mid));
-
-  return merge(left, right);
-
-};
-
-
-// BUBBLE SORT
-var bubbleCount = 0;
-const bubbleSort = (inputArr) => {
+// -------------------------- bubble -----------------------------
+var countBubble = 0;
+let bubbleSort = (inputArr) => {
   let len = inputArr.length; //mesure la longueur de l'array
   for (let i = 0; i < len; i++) {
     for (let j = 0; j < len - 1 - i; j++) {
-      bubbleCount ++;
+      countBubble++
       if (inputArr[j] > inputArr[j + 1]) {
         let tmp = inputArr[j]; //stock temporairement data
         inputArr[j] = inputArr[j + 1];
@@ -47,13 +61,14 @@ const bubbleSort = (inputArr) => {
       }
     }
   }
-  console.log(`Tri bulle: ${bubbleCount} comparaisons - [${inputArr}]`);
+  return inputArr;
 };
+// -------------------------- end bubble ------------------------
 
+// -------------------------- selection -------------------------
 
-//SELECTION SORT
+var countSelection = 0;
 const selectionSort = (inputArr) => {
-  let count = 0;
   let n = inputArr.length;
   for(let i = 0; i < n; i++) {
     // Finding the smallest number in the subarray
@@ -62,7 +77,7 @@ const selectionSort = (inputArr) => {
       if(inputArr[j] < inputArr[min]) {
           min=j;
       }
-      count++;
+      countSelection++;
     }
     if (min != i) {
       // Swapping the elements
@@ -71,23 +86,43 @@ const selectionSort = (inputArr) => {
       inputArr[min] = tmp;
     }
   }
-  console.log(`Tri par selection : ${count} comparaisons - [${inputArr}]`);
+  return inputArr;
 }
 
+// -------------------------- end selection ---------------------
 
-fs.readFile(fileName, "utf8", (error, data) => {
+//Define array
+const createArrayData = (data) => {
+  return data.split(" ").map(string => parseInt(string, 10));
+}
+
+//Alert if NaN
+const alertIfNaN = (arrayData) => {
+  if(arrayData.includes(NaN))return true;
+}
+
+const fs = require('fs');
+const fileName = process.argv[2];
+// Méthode asynchrone
+fs.readFile(fileName, 'utf8', (error, data) => {
   if (error) {
     console.error(error.message);
-    return;
+    return ;
   }
-  arr_data = data.split(" ").map((num) => parseInt(num, 10));
+  const arrayData = createArrayData(data);
+    if (!alertIfNaN(arrayData)) {
+      //fusion
+      let fusionOutput = sliceAndFusion(arrayData);
+      console.log(`Tri fusion: ${countFusion} comparaisons - ${fusionOutput}`);
+      //bubble
+      let bubbleOutput = bubbleSort(arrayData);
+      console.log(`Tri bubble: ${countBubble} comparaisons - ${bubbleOutput}`);
+      //selection
+      let selectionOutput = selectionSort(arrayData);
+      console.log(`Tri selection: ${countSelection} comparaisons - ${selectionOutput}`);
 
 
-  bubbleSort(arr_data);
-  console.log('')
-  selectionSort(arr_data);
-  console.log('')
-  console.log('Tri fusion ' + mergeSort(arr_data));
-
+  } else {
+    console.log('ERROR: wrong input values or empty file');
+  }
 });
-
